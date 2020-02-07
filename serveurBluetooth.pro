@@ -19,16 +19,27 @@ SOURCES += \
     bluetoothe.cpp \
     main.cpp \
     dialog.cpp \
-    socketbluetooth.cpp
+    socketbluetooth.cpp \
+    socketdialog.cpp \
+    filedialog.cpp \
+    clientsocketbluetooth.cpp \
+    remoteselectordialog.cpp
 
 HEADERS += \
     bluetoothe.h \
     dialog.h \
-    socketbluetooth.h
+    socketbluetooth.h \
+    socketdialog.h \
+    filedialog.h \
+    clientsocketbluetooth.h \
+    remoteselectordialog.h
 
 FORMS += \
     bluetoothe.ui \
-    dialog.ui
+    dialog.ui \
+    socketdialog.ui \
+    filedialog.ui \
+    remoteselectordialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

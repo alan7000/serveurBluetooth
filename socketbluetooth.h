@@ -5,17 +5,18 @@
 
 #include <QtBluetooth/qbluetoothaddress.h>
 #include <QtBluetooth/qbluetoothserviceinfo.h>
-#include "bluetoothe.h"
 
 QT_FORWARD_DECLARE_CLASS(QBluetoothServer)
 QT_FORWARD_DECLARE_CLASS(QBluetoothSocket)
+
+QT_USE_NAMESPACE
 
 class socketBluetooth : public QObject
 {
     Q_OBJECT
 
 public:
-    socketBluetooth();
+    explicit socketBluetooth(QObject *parent = nullptr);
     ~socketBluetooth();
 
     void startServer(const QBluetoothAddress &localAdapter = QBluetoothAddress());
@@ -39,7 +40,6 @@ private:
     QBluetoothServer *rfcommServer = nullptr;
     QBluetoothServiceInfo serviceInfo;
     QList<QBluetoothSocket *> clientSockets;
-    Bluetoothe *bluetooth;
 };
 
 #endif // SOCKETBLUETOOTH_H

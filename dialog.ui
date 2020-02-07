@@ -6,90 +6,37 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>372</width>
+    <height>66</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0" colspan="2">
-    <widget class="QLineEdit" name="lineEditTrame"/>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="pushButtonTrame">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Send trame</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="QPushButton" name="pushButton_Quit">
-     <property name="text">
-      <string>Quitter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="4">
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Programme test d'envoie de trame ou de fichier</string>
+      <string>Programme de test pour l'envoi via le bluetooth</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="pushButton_selectDevice">
+   <item row="1" column="0">
+    <widget class="QPushButton" name="pushButtonSocket">
      <property name="text">
-      <string>Selection périphérique</string>
+      <string>Socket</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="pushButton_SelectFile">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="pushButtonFile">
      <property name="text">
-      <string>Select file</string>
+      <string>File</string>
      </property>
     </widget>
-   </item>
-   <item row="2" column="4">
-    <widget class="QPushButton" name="pushButton_sendFile">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Send file</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="5">
-    <widget class="QTextEdit" name="textEditRponse"/>
    </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>pushButton_Quit</sender>
-   <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>627</x>
-     <y>582</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>308</x>
-     <y>575</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

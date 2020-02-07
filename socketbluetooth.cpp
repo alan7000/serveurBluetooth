@@ -4,10 +4,10 @@
 #include <QtBluetooth/QBluetoothSocket>
 
 //! [Service UUID]
-static const QLatin1String serviceUuid("e8e10f95-1a70-4b27-9ccf-02010264e9c8");
+static const QLatin1String serviceUuid("e8e10f95-1a70-4b27-9ccf-02010264e9c9"); //e8e10f95-1a70-4b27-9ccf-02010264e9c8
 //! [Service UUID]
 
-socketBluetooth::socketBluetooth()
+socketBluetooth::socketBluetooth(QObject *parent) : QObject (parent)
 {
 
 }
