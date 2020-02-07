@@ -128,9 +128,9 @@ void Bluetoothe::serviceDiscovered(const QBluetoothServiceInfo &serviceInfo)
     else
         remoteName = serviceInfo.device().name();
 
-//    QListWidgetItem *item =
-//        new QListWidgetItem(QString::fromLatin1("%1\t%2\t%3").arg(serviceInfo.device().address().toString(),
-//                                                             serviceInfo.device().name(), serviceInfo.serviceName()));
+    //    QListWidgetItem *item =
+    //        new QListWidgetItem(QString::fromLatin1("%1\t%2\t%3").arg(serviceInfo.device().address().toString(),
+    //                                                             serviceInfo.device().name(), serviceInfo.serviceName()));
 
     QMutableMapIterator<int, QBluetoothServiceInfo> i(m_discoveredServices);
     while (i.hasNext()){
@@ -295,7 +295,7 @@ void Bluetoothe::on_tableWidget_itemActivated(QTableWidgetItem *item)
         return; // don't continue and start movie
     }
     else if ((item->checkState() == Qt::Checked && column == 3) ||
-            (item->checkState() == Qt::Unchecked && column == 4)){
+             (item->checkState() == Qt::Unchecked && column == 4)){
         m_localDevice->requestPairing(m_service.device().address(), QBluetoothLocalDevice::Paired);
         ui->tableWidget->blockSignals(true);
         ui->tableWidget->item(row, column)->setCheckState(Qt::PartiallyChecked);
@@ -325,8 +325,8 @@ void Bluetoothe::on_SelectDeviceButton_clicked()
     ui->Status->setText("Appareil " + m_service.device().name());
 
     //mettre les boutons enable
-//    this->dialog->pushButtonTrame->setEnabled(true);
-//    this->dialog->pushButton_sendFile->setEnabled(true);
-//    this->dialog->pushButton_SelectFile->setEnabled(true);
+    //    this->dialog->pushButtonTrame->setEnabled(true);
+    //    this->dialog->pushButton_sendFile->setEnabled(true);
+    //    this->dialog->pushButton_SelectFile->setEnabled(true);
     this->setFlag(true);
 }

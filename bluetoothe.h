@@ -9,8 +9,6 @@
 #include <qbluetoothservicediscoveryagent.h>
 #include <qbluetoothlocaldevice.h>
 
-#include <ui_dialog.h>
-
 QT_FORWARD_DECLARE_CLASS(QModelIndex)
 QT_FORWARD_DECLARE_CLASS(QTableWidgetItem)
 QT_FORWARD_DECLARE_CLASS(QFile)
@@ -30,14 +28,12 @@ class Bluetoothe : public QDialog
     Q_OBJECT
 
 public:
-    explicit Bluetoothe(QWidget *parent = 0);
+    explicit Bluetoothe(QWidget *parent = nullptr);
     ~Bluetoothe();
 
     void startDiscovery(const QBluetoothUuid &uuid);
     QBluetoothServiceInfo service() const;
     QBluetoothServiceInfo m_service;
-
-    Ui_Dialog *dialog;
 
     QString getTab() const;
     void setTab(const QString &value);
