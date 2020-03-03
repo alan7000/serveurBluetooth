@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Bluetoothe</class>
- <widget class="QDialog" name="Bluetoothe">
+ <class>RemoteSelectorFileDialog</class>
+ <widget class="QDialog" name="RemoteSelectorFileDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -19,9 +19,23 @@
      <item row="0" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
+        <widget class="QLabel" name="busyWidget">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="Status">
          <property name="text">
           <string>Scanning...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="pairingBusy">
+         <property name="text">
+          <string>TextLabel</string>
          </property>
         </widget>
        </item>
@@ -64,19 +78,7 @@
      </row>
      <column>
       <property name="text">
-       <string>MAC Adresse</string>
-      </property>
-      <property name="textAlignment">
-       <set>AlignLeft|AlignVCenter</set>
-      </property>
-      <property name="foreground">
-       <brush brushstyle="NoBrush">
-        <color alpha="255">
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </brush>
+       <string>Mac Adress</string>
       </property>
      </column>
      <column>
@@ -94,7 +96,7 @@
        <string>Paired</string>
       </property>
       <property name="textAlignment">
-       <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       <set>AlignCenter</set>
       </property>
      </column>
      <column>
@@ -102,14 +104,9 @@
        <string>Authorized</string>
       </property>
       <property name="textAlignment">
-       <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       <set>AlignCenter</set>
       </property>
      </column>
-     <item row="0" column="0">
-      <property name="text">
-       <string/>
-      </property>
-     </item>
     </widget>
    </item>
    <item>

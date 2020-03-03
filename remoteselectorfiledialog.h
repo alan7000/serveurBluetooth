@@ -1,5 +1,5 @@
-#ifndef BLUETOOTHE_H
-#define BLUETOOTHE_H
+#ifndef REMOTESELECTORFILEDIALOG_H
+#define REMOTESELECTORFILEDIALOG_H
 
 #include <QDialog>
 #include <QPointer>
@@ -13,27 +13,27 @@ QT_FORWARD_DECLARE_CLASS(QModelIndex)
 QT_FORWARD_DECLARE_CLASS(QTableWidgetItem)
 QT_FORWARD_DECLARE_CLASS(QFile)
 
-
+class pinDisplay;
 
 QT_USE_NAMESPACE
 
 QT_BEGIN_NAMESPACE
 
 namespace Ui {
-class Bluetoothe;
+class RemoteSelectorFileDialog;
 }
+QT_END_NAMESPACE
 
-class Bluetoothe : public QDialog
+class RemoteSelectorFileDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit Bluetoothe(QWidget *parent = nullptr);
-    ~Bluetoothe();
+    explicit RemoteSelectorFileDialog(QWidget *parent = nullptr);
+    ~RemoteSelectorFileDialog();
 
     void startDiscovery(const QBluetoothUuid &uuid);
     QBluetoothServiceInfo service() const;
-    QBluetoothServiceInfo m_service;
 
     QString getTab() const;
     void setTab(const QString &value);
@@ -45,36 +45,35 @@ public Q_SLOTS:
     void startDiscovery();
 
 private slots:
-    void on_pushButton_clicked();
-
-    void on_StopButton_clicked();
-
-    void on_ActualiserButton_clicked();
-
-
     void serviceDiscovered(const QBluetoothServiceInfo &serviceInfo);
     void discoveryFinished();
 
+    void on_pushButton_clicked();
+    void on_StopButton_clicked();
+    void on_ActualiserButton_clicked();
 
-    void pairingFinished(const QBluetoothAddress &address,QBluetoothLocalDevice::Pairing pairing);
+    void pairingFinished(const QBluetoothAddress &address, QBluetoothLocalDevice::Pairing status);
     void pairingError(QBluetoothLocalDevice::Error error);
+    void displayPin(const QBluetoothAddress &address, QString pin);
+    void displayConfirmation(const QBluetoothAddress &address, QString pin);
     void displayConfReject();
     void displayConfAccepted();
-
-    void on_tableWidget_itemActivated(QTableWidgetItem *item);
 
     void on_tableWidget_cellClicked(int row, int column);
 
     void on_SelectDeviceButton_clicked();
 
+    void on_tableWidget_itemChanged(QTableWidgetItem *item);
+
 private:
-    Ui::Bluetoothe *ui;
+    Ui::RemoteSelectorFileDialog *ui;
 
     QBluetoothServiceDiscoveryAgent *m_discoveryAgent;
-
+    QBluetoothServiceInfo m_service;
     QMap<int, QBluetoothServiceInfo> m_discoveredServices;
     QFile *m_file;
     QBluetoothLocalDevice *m_localDevice;
+    QPointer<pinDisplay> m_pindisplay;
     bool m_pairingError;
 
     QString addressToName(const QBluetoothAddress &address);
@@ -84,4 +83,4 @@ private:
     bool flag;
 };
 
-#endif // BLUETOOTHE_H
+#endif // REMOTESELECTORFILEDIALOG_H

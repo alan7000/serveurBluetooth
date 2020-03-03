@@ -1,5 +1,5 @@
-#include "bluetoothe.h"
-#include "ui_bluetoothe.h"
+#include "remoteselectorfiledialog.h"
+#include "ui_remoteselectorfiledialog.h"
 
 #include <qbluetoothdeviceinfo.h>
 #include <qbluetoothaddress.h>
@@ -12,11 +12,13 @@
 #include <QFileDialog>
 #include <QCheckBox>
 
+#include "pindisplay.h"
+
 QT_USE_NAMESPACE
 
-Bluetoothe::Bluetoothe(QWidget *parent) :
+RemoteSelectorFileDialog::RemoteSelectorFileDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Bluetoothe),
+    ui(new Ui::RemoteSelectorFileDialog),
     m_localDevice(new QBluetoothLocalDevice),
     m_pairingError(false)
 {
@@ -44,10 +46,21 @@ Bluetoothe::Bluetoothe(QWidget *parent) :
     ui->tableWidget->setColumnWidth(3, 75);
     ui->tableWidget->setColumnWidth(4, 100);
 
+    connect(m_localDevice, SIGNAL(pairingDisplayPinCode(QBluetoothAddress,QString)),
+            this, SLOT(displayPin(QBluetoothAddress,QString)));
+    connect(m_localDevice, SIGNAL(pairingDisplayConfirmation(QBluetoothAddress,QString)),
+            this, SLOT(displayConfirmation(QBluetoothAddress,QString)));
     connect(m_localDevice, SIGNAL(pairingFinished(QBluetoothAddress,QBluetoothLocalDevice::Pairing)),
             this, SLOT(pairingFinished(QBluetoothAddress,QBluetoothLocalDevice::Pairing)));
     connect(m_localDevice, SIGNAL(error(QBluetoothLocalDevice::Error)),
             this, SLOT(pairingError(QBluetoothLocalDevice::Error)));
+
+
+    ui->busyWidget->setMovie(new QMovie(":/icons/busy.gif"));
+    ui->busyWidget->movie()->start();
+
+    ui->pairingBusy->setMovie(new QMovie(":/icons/pairing.gif"));
+    ui->pairingBusy->hide();
 
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
@@ -56,19 +69,45 @@ Bluetoothe::Bluetoothe(QWidget *parent) :
     this->setFlag(false);
 }
 
-Bluetoothe::~Bluetoothe()
+RemoteSelectorFileDialog::~RemoteSelectorFileDialog()
 {
     delete ui;
     delete m_discoveryAgent;
     delete m_localDevice;
 }
 
-void Bluetoothe::startDiscovery(const QBluetoothUuid &uuid)
+//void RemoteSelectorFileDialog::startDiscovery(const QBluetoothUuid &uuid)
+//{
+//    qWarning("start discovery");
+//    ui->StopButton->setDisabled(false);
+//    if (m_discoveryAgent->isActive())
+//        m_discoveryAgent->stop();
+
+//    m_discoveryAgent->setUuidFilter(uuid);
+//    m_discoveryAgent->start();
+
+//    if (!m_discoveryAgent->isActive() ||
+//            m_discoveryAgent->error() != QBluetoothServiceDiscoveryAgent::NoError) {
+//        ui->Status->setText(tr("Cannot find remote services."));
+//    } else {
+//        ui->Status->setText(tr("Scanning..."));
+//        ui->busyWidget->show();
+//        ui->busyWidget->movie()->start();
+//    }
+//}
+
+QBluetoothServiceInfo RemoteSelectorFileDialog::service() const
 {
-    qWarning("start discovery");
+    return m_service;
+}
+
+void RemoteSelectorFileDialog::startDiscovery(const QBluetoothUuid &uuid)
+{
+    qWarning("Start discovery");
     ui->StopButton->setDisabled(false);
-    if (m_discoveryAgent->isActive())
+    if (m_discoveryAgent->isActive()) {
         m_discoveryAgent->stop();
+    }
 
     m_discoveryAgent->setUuidFilter(uuid);
     m_discoveryAgent->start();
@@ -78,36 +117,28 @@ void Bluetoothe::startDiscovery(const QBluetoothUuid &uuid)
         ui->Status->setText(tr("Cannot find remote services."));
     } else {
         ui->Status->setText(tr("Scanning..."));
+        ui->busyWidget->show();
+        ui->busyWidget->movie()->start();
     }
 }
 
-QBluetoothServiceInfo Bluetoothe::service() const
-{
-    return m_service;
-}
-
-void Bluetoothe::startDiscovery()
-{
-    startDiscovery(QBluetoothUuid(QBluetoothUuid::ObexObjectPush));
-}
-
-void Bluetoothe::on_pushButton_clicked()
+void RemoteSelectorFileDialog::on_pushButton_clicked()
 {
     reject();
 }
 
-void Bluetoothe::on_StopButton_clicked()
+void RemoteSelectorFileDialog::on_StopButton_clicked()
 {
     m_discoveryAgent->stop();
 }
 
-void Bluetoothe::on_ActualiserButton_clicked()
+void RemoteSelectorFileDialog::on_ActualiserButton_clicked()
 {
     startDiscovery();
     ui->StopButton->setDisabled(false);
 }
 
-void Bluetoothe::serviceDiscovered(const QBluetoothServiceInfo &serviceInfo)
+void RemoteSelectorFileDialog::serviceDiscovered(const QBluetoothServiceInfo &serviceInfo)
 {
 #if 0
     qDebug() << "Discovered service on"
@@ -178,16 +209,21 @@ void Bluetoothe::serviceDiscovered(const QBluetoothServiceInfo &serviceInfo)
     m_discoveredServices.insert(row, serviceInfo);
 }
 
-void Bluetoothe::discoveryFinished()
+void RemoteSelectorFileDialog::discoveryFinished()
 {
     ui->Status->setText(tr("Select the device to send to."));
     ui->StopButton->setDisabled(true);
+    ui->busyWidget->movie()->stop();
+    ui->busyWidget->hide();
 }
 
-void Bluetoothe::pairingFinished(const QBluetoothAddress &address, QBluetoothLocalDevice::Pairing pairing)
+void RemoteSelectorFileDialog::pairingFinished(const QBluetoothAddress &address, QBluetoothLocalDevice::Pairing status)
 {
     QBluetoothServiceInfo service;
     int row = 0;
+
+    ui->pairingBusy->hide();
+    ui->pairingBusy->movie()->stop();
 
     ui->tableWidget->blockSignals(true);
 
@@ -199,22 +235,26 @@ void Bluetoothe::pairingFinished(const QBluetoothAddress &address, QBluetoothLoc
         }
     }
 
+    if (m_pindisplay) {
+        delete m_pindisplay;
+    }
+
     QMessageBox msgBox;
     if (m_pairingError) {
         msgBox.setText("Pairing failed with " + address.toString());
-    } else if (pairing == QBluetoothLocalDevice::Paired
-               || pairing == QBluetoothLocalDevice::AuthorizedPaired) {
+    } else if (status == QBluetoothLocalDevice::Paired
+               || status == QBluetoothLocalDevice::AuthorizedPaired) {
         msgBox.setText("Paired successfully with " + address.toString());
     } else {
         msgBox.setText("Pairing released with " + address.toString());
     }
 
     if (service.isValid()){
-        if (pairing == QBluetoothLocalDevice::AuthorizedPaired){
+        if (status == QBluetoothLocalDevice::AuthorizedPaired){
             ui->tableWidget->item(row, 3)->setCheckState(Qt::Checked);
             ui->tableWidget->item(row, 4)->setCheckState(Qt::Checked);
         }
-        else if (pairing == QBluetoothLocalDevice::Paired){
+        else if (status == QBluetoothLocalDevice::Paired){
             ui->tableWidget->item(row, 3)->setCheckState(Qt::Checked);
             ui->tableWidget->item(row, 4)->setCheckState(Qt::Unchecked);
         }
@@ -230,7 +270,7 @@ void Bluetoothe::pairingFinished(const QBluetoothAddress &address, QBluetoothLoc
     ui->tableWidget->blockSignals(false);
 }
 
-void Bluetoothe::pairingError(QBluetoothLocalDevice::Error error)
+void RemoteSelectorFileDialog::pairingError(QBluetoothLocalDevice::Error error)
 {
     if (error != QBluetoothLocalDevice::PairingError)
         return;
@@ -239,18 +279,39 @@ void Bluetoothe::pairingError(QBluetoothLocalDevice::Error error)
     pairingFinished(m_service.device().address(), QBluetoothLocalDevice::Unpaired);
 }
 
+void RemoteSelectorFileDialog::displayPin(const QBluetoothAddress &address, QString pin)
+{
+    if (m_pindisplay)
+        m_pindisplay->deleteLater();
+    m_pindisplay = new pinDisplay(QString("Enter pairing pin on: %1").arg(addressToName(address)), pin, this);
+    m_pindisplay->show();
+}
 
-void Bluetoothe::displayConfReject()
+void RemoteSelectorFileDialog::displayConfirmation(const QBluetoothAddress &address, QString pin)
+{
+    Q_UNUSED(address);
+
+    if (m_pindisplay)
+        m_pindisplay->deleteLater();
+    m_pindisplay = new pinDisplay(QString("Confirm this pin is the same"), pin, this);
+    connect(m_pindisplay, SIGNAL(accepted()), this, SLOT(displayConfAccepted()));
+    connect(m_pindisplay, SIGNAL(rejected()), this, SLOT(displayConfReject()));
+    m_pindisplay->setOkCancel();
+    m_pindisplay->show();
+}
+
+
+void RemoteSelectorFileDialog::displayConfReject()
 {
     m_localDevice->pairingConfirmation(false);
 }
 
-void Bluetoothe::displayConfAccepted()
+void RemoteSelectorFileDialog::displayConfAccepted()
 {
     m_localDevice->pairingConfirmation(true);
 }
 
-QString Bluetoothe::addressToName(const QBluetoothAddress &address)
+QString RemoteSelectorFileDialog::addressToName(const QBluetoothAddress &address)
 {
     QMapIterator<int, QBluetoothServiceInfo> i(m_discoveredServices);
     while (i.hasNext()){
@@ -261,27 +322,53 @@ QString Bluetoothe::addressToName(const QBluetoothAddress &address)
     return address.toString();
 }
 
-bool Bluetoothe::getFlag() const
+bool RemoteSelectorFileDialog::getFlag() const
 {
     return flag;
 }
 
-void Bluetoothe::setFlag(bool value)
+void RemoteSelectorFileDialog::setFlag(bool value)
 {
     flag = value;
 }
-QString Bluetoothe::getTab() const
+
+void RemoteSelectorFileDialog::startDiscovery()
+{
+    startDiscovery(QBluetoothUuid(QBluetoothUuid::ObexObjectPush));
+}
+QString RemoteSelectorFileDialog::getTab() const
 {
     return tab;
 }
 
-void Bluetoothe::setTab(const QString &value)
+void RemoteSelectorFileDialog::setTab(const QString &value)
 {
     tab = value;
 }
 
+void RemoteSelectorFileDialog::on_tableWidget_cellClicked(int row, int column)
+{
+    Q_UNUSED(column);
 
-void Bluetoothe::on_tableWidget_itemActivated(QTableWidgetItem *item)
+    m_service = m_discoveredServices.value(row);
+
+    ui->tableWidget->selectRow(row);
+}
+
+void RemoteSelectorFileDialog::on_SelectDeviceButton_clicked()
+{
+    this->setTab(m_service.device().address().toString());
+    qWarning("%s", getTab().toUtf8().data());
+    ui->Status->setText("Appareil " + m_service.device().name());
+
+    //mettre les boutons enable
+    //    this->dialog->pushButtonTrame->setEnabled(true);
+    //    this->dialog->pushButton_sendFile->setEnabled(true);
+    //    this->dialog->pushButton_SelectFile->setEnabled(true);
+    this->setFlag(true);
+}
+
+void RemoteSelectorFileDialog::on_tableWidget_itemChanged(QTableWidgetItem *item)
 {
     int row = item->row();
     int column = item->column();
@@ -307,26 +394,6 @@ void Bluetoothe::on_tableWidget_itemActivated(QTableWidgetItem *item)
         ui->tableWidget->item(row, column)->setCheckState(Qt::PartiallyChecked);
         ui->tableWidget->blockSignals(false);
     }
-}
-
-void Bluetoothe::on_tableWidget_cellClicked(int row, int column)
-{
-    Q_UNUSED(column);
-
-    m_service = m_discoveredServices.value(row);
-
-    ui->tableWidget->selectRow(row);
-}
-
-void Bluetoothe::on_SelectDeviceButton_clicked()
-{
-    this->setTab(m_service.device().address().toString());
-    qWarning("%s", getTab().toUtf8().data());
-    ui->Status->setText("Appareil " + m_service.device().name());
-
-    //mettre les boutons enable
-    //    this->dialog->pushButtonTrame->setEnabled(true);
-    //    this->dialog->pushButton_sendFile->setEnabled(true);
-    //    this->dialog->pushButton_SelectFile->setEnabled(true);
-    this->setFlag(true);
+    ui->pairingBusy->show();
+    ui->pairingBusy->movie()->start();
 }

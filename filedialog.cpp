@@ -1,6 +1,6 @@
 #include "filedialog.h"
 #include "ui_filedialog.h"
-#include "bluetoothe.h"
+#include "remoteselectorfiledialog.h"
 
 #include <QTextStream>
 #include <QFile>
@@ -22,10 +22,15 @@ FileDialog::~FileDialog()
     delete ui;
 }
 
+QBluetoothServiceInfo FileDialog::service() const
+{
+    return m_service;
+}
+
 void FileDialog::on_pushButton_selectDevice_clicked()
 {
-    this->bluetoothe.show();
-    if (this->bluetoothe.getFlag()) {
+    this->remoteselectorfiledialog.show();
+    if (this->remoteselectorfiledialog.getFlag()) {
             ui->pushButton_sendFile->setEnabled(true);
             ui->pushButton_SelectFile->setEnabled(true);
     }
@@ -43,7 +48,7 @@ void FileDialog::on_pushButton_SelectFile_clicked()
 void FileDialog::on_pushButton_sendFile_clicked()
 {
     QBluetoothTransferManager mgr;
-    QBluetoothTransferRequest req(this->bluetoothe.m_service.device().address());
+    QBluetoothTransferRequest req(this->remoteselectorfiledialog.service().device().address());
     qDebug() << "Récuperation de l'addresse";
     m_file = new QFile(ui->lineEditTrame->text());
 

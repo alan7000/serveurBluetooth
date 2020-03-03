@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QFileDialog>
 
-#include "bluetoothe.h"
+#include "remoteselectorfiledialog.h"
 
 namespace Ui {
 class FileDialog;
@@ -17,6 +17,7 @@ class FileDialog : public QDialog
 public:
     explicit FileDialog(QWidget *parent = nullptr);
     ~FileDialog();
+    QBluetoothServiceInfo service() const;
 
 private:
     Ui::FileDialog *ui;
@@ -29,7 +30,7 @@ private slots:
     void on_pushButton_sendFile_clicked();
 
 private:
-    Bluetoothe bluetoothe;
+    RemoteSelectorFileDialog remoteselectorfiledialog;
 
     QBluetoothServiceInfo m_service;
     QBluetoothDeviceDiscoveryAgent *m_discoveryAgent;

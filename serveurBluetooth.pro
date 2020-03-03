@@ -16,9 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    bluetoothe.cpp \
     main.cpp \
     dialog.cpp \
+    pindisplay.cpp \
+    remoteselectorfiledialog.cpp \
     socketbluetooth.cpp \
     socketdialog.cpp \
     filedialog.cpp \
@@ -26,8 +27,9 @@ SOURCES += \
     remoteselectordialog.cpp
 
 HEADERS += \
-    bluetoothe.h \
     dialog.h \
+    pindisplay.h \
+    remoteselectorfiledialog.h \
     socketbluetooth.h \
     socketdialog.h \
     filedialog.h \
@@ -35,8 +37,9 @@ HEADERS += \
     remoteselectordialog.h
 
 FORMS += \
-    bluetoothe.ui \
     dialog.ui \
+    pindisplay.ui \
+    remoteselectorfiledialog.ui \
     socketdialog.ui \
     filedialog.ui \
     remoteselectordialog.ui
@@ -49,3 +52,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     busy.gif \
     pairing.gif
+
+RESOURCES += \
+    icone.qrc
