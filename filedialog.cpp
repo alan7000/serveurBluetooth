@@ -30,6 +30,7 @@ QBluetoothServiceInfo FileDialog::service() const
 void FileDialog::on_pushButton_selectDevice_clicked()
 {
     this->remoteselectorfiledialog.show();
+
     if (this->remoteselectorfiledialog.getFlag()) {
             ui->pushButton_sendFile->setEnabled(true);
             ui->pushButton_SelectFile->setEnabled(true);
