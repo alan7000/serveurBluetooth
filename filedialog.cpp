@@ -32,8 +32,8 @@ void FileDialog::on_pushButton_selectDevice_clicked()
     this->remoteselectorfiledialog.show();
 
     if (this->remoteselectorfiledialog.getFlag()) {
-            ui->pushButton_sendFile->setEnabled(true);
-            ui->pushButton_SelectFile->setEnabled(true);
+        ui->pushButton_sendFile->setEnabled(true);
+        ui->pushButton_SelectFile->setEnabled(true);
     }
 
 }
@@ -53,12 +53,17 @@ void FileDialog::on_pushButton_sendFile_clicked()
     qDebug() << "Récuperation de l'addresse";
     m_file = new QFile(ui->lineEditTrame->text());
 
-    QBluetoothTransferReply *reply = mgr.put(req, m_file);
-    reply->setParent(this);
-    if (reply->error()) {
-        qDebug() << "Failed to send file";
-        reply->deleteLater();
-        return;
+    for (int var = 0; var < 100; ++var) {
+        QBluetoothTransferReply *reply = mgr.put(req, m_file);
+        reply->setParent(this);
+
+        if (reply->error()) {
+            qDebug() << "Failed to send file";
+            reply->deleteLater();
+            return;
+        }
+
+
     }
 
 }

@@ -5,6 +5,7 @@
 #include <QFileDialog>
 
 #include "remoteselectorfiledialog.h"
+#include "sleeper.h"
 
 namespace Ui {
 class FileDialog;
@@ -37,6 +38,8 @@ private:
     QMap<int, QBluetoothServiceInfo> m_discoveredServices;
     QFile *m_file;
     QBluetoothLocalDevice *m_localDevice;
+
+    Sleeper *sleeper;
 };
 
 #endif // FILEDIALOG_H
